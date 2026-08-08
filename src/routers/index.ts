@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import { createHashRouter } from 'react-router';
 import AdminLayout from '@/components/layout';
 import Root from '@/components/root';
@@ -14,7 +15,14 @@ const router = createHashRouter([
       },
       {
         path: '/login',
-        lazy: () => import('@/pages/login').then((module) => ({ Component: module.default })),
+        lazy: () =>
+          import('@/pages/login').then((module) => ({
+            Component: module.default,
+          })),
+      },
+      {
+        path: 'blog',
+        Component: lazy(() => import('@/pages/blog')),
       },
     ],
   },
