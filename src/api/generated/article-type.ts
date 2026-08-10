@@ -4,26 +4,61 @@
  * My API
  * OpenAPI spec version: 1.0.0
  */
+import useSwr from 'swr';
 import type {
-  ArticleTypeDTO
+  Key,
+  SWRConfiguration
+} from 'swr';
+
+import type {
+  ArticleTypeDTO,
+  ErrorModel
 } from './models';
 
 import { customAxios } from '../custom-axios.ts';
+import type { ErrorType } from '../custom-axios.ts';
 
 
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+  type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-  /**
+
+ /**
  * @summary 列表
  */
-export const list2 = (
+export const list = (
 
- options?: SecondParameter<typeof customAxios<ArticleTypeDTO[] | null>>,) => {
-      return customAxios<ArticleTypeDTO[] | null>(
-      {url: `/article-type`, method: 'GET'
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<ArticleTypeDTO[] | null>(
+    {url: `/article-type`, method: 'GET'
     },
-      options);
-    }
-  export type List2Result = NonNullable<Awaited<ReturnType<typeof list2>>>
+    options);
+  }
+
+
+
+export const getListKey = () => [`/article-type`] as const;
+
+export type ListQueryResult = NonNullable<Awaited<ReturnType<typeof list>>>
+
+/**
+ * @summary 列表
+ */
+export const useList = <TError = ErrorType<ErrorModel>>(
+   options?: { swr?:SWRConfiguration<Awaited<ReturnType<typeof list>>, TError> & { swrKey?: Key, enabled?: boolean }, request?: SecondParameter<typeof customAxios> }
+) => {
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const isEnabled = swrOptions?.enabled !== false
+  const swrKey = swrOptions?.swrKey ?? (() => isEnabled ? getListKey() : null);
+  const swrFn = () => list(requestOptions)
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}

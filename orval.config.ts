@@ -7,7 +7,8 @@ export default defineConfig({
       tsconfig: './tsconfig.app.json',
       target: './src/api/generated/api.ts',
       schemas: './src/api/generated/models',
-      client: 'axios-functions',
+      client: 'swr',
+      httpClient: 'axios',
       mode: 'tags',
       override: {
         mutator: {
@@ -15,7 +16,7 @@ export default defineConfig({
           name: 'customAxios',
         },
         // 自定义生成的函数/Hook 名称
-        operationName: (operation, route, verb) => {
+        operationName: (operation) => {
           const id = operation.operationId || '';
           // 如果后端拼接的是 "list-article" 或 "list-user"，只截取前面的 "list"
           if (id.includes('-')) {

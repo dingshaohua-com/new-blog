@@ -4,28 +4,101 @@
  * My API
  * OpenAPI spec version: 1.0.0
  */
+import useSwr from 'swr';
 import type {
+  Key,
+  SWRConfiguration
+} from 'swr';
+
+import type {
+  ArticleDetailDTO,
+  ErrorModel,
   ListParams,
   PageResultArticleDTO
 } from './models';
 
 import { customAxios } from '../custom-axios.ts';
+import type { ErrorType } from '../custom-axios.ts';
 
 
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+  type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-  /**
+
+ /**
  * @summary 列表
  */
 export const list = (
     params?: ListParams,
- options?: SecondParameter<typeof customAxios<PageResultArticleDTO>>,) => {
-      return customAxios<PageResultArticleDTO>(
-      {url: `/article`, method: 'GET',
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<PageResultArticleDTO>(
+    {url: `/article`, method: 'GET',
         params
     },
-      options);
-    }
-  export type ListResult = NonNullable<Awaited<ReturnType<typeof list>>>
+    options);
+  }
+
+
+
+export const getListKey = (params?: ListParams,) => [`/article`, ...(params ? [params]: [])] as const;
+
+export type ListQueryResult = NonNullable<Awaited<ReturnType<typeof list>>>
+
+/**
+ * @summary 列表
+ */
+export const useList = <TError = ErrorType<ErrorModel>>(
+  params?: ListParams, options?: { swr?:SWRConfiguration<Awaited<ReturnType<typeof list>>, TError> & { swrKey?: Key, enabled?: boolean }, request?: SecondParameter<typeof customAxios> }
+) => {
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const isEnabled = swrOptions?.enabled !== false
+  const swrKey = swrOptions?.swrKey ?? (() => isEnabled ? getListKey(params) : null);
+  const swrFn = () => list(params, requestOptions)
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}
+/**
+ * @summary 获取单条
+ */
+export const get = (
+    id: number,
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<ArticleDetailDTO>(
+    {url: `/article/${id}`, method: 'GET'
+    },
+    options);
+  }
+
+
+
+export const getGetKey = (id: number,) => [`/article/${id}`] as const;
+
+export type GetQueryResult = NonNullable<Awaited<ReturnType<typeof get>>>
+
+/**
+ * @summary 获取单条
+ */
+export const useGet = <TError = ErrorType<ErrorModel>>(
+  id: number, options?: { swr?:SWRConfiguration<Awaited<ReturnType<typeof get>>, TError> & { swrKey?: Key, enabled?: boolean }, request?: SecondParameter<typeof customAxios> }
+) => {
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const isEnabled = swrOptions?.enabled !== false && id !== null && id !== undefined
+  const swrKey = swrOptions?.swrKey ?? (() => isEnabled ? getGetKey(id) : null);
+  const swrFn = () => get(id, requestOptions)
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}

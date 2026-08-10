@@ -21,8 +21,12 @@ const router = createHashRouter([
           })),
       },
       {
-        path: 'blog',
-        Component: lazy(() => import('@/pages/blog')),
+        path: 'article',
+        Component: lazy(() => import('@/pages/article')),
+      },
+      {
+        path: 'article/:id',
+        Component: lazy(() => import('@/pages/article-detail')),
       },
     ],
   },

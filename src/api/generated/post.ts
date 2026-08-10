@@ -4,86 +4,242 @@
  * My API
  * OpenAPI spec version: 1.0.0
  */
+import useSwr from 'swr';
+import type {
+  Arguments,
+  Key,
+  SWRConfiguration
+} from 'swr';
+
+import useSWRMutation from 'swr/mutation';
+import type {
+  SWRMutationConfiguration
+} from 'swr/mutation';
+
 import type {
   CreatePostRequestBody,
+  ErrorModel,
   PostDTO,
   UpdatePostRequestBody
 } from './models';
 
 import { customAxios } from '../custom-axios.ts';
+import type { ErrorType } from '../custom-axios.ts';
 
 
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+  type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-  /**
+
+ /**
  * 说说
  * @summary 列表
  */
 export const list1 = (
 
- options?: SecondParameter<typeof customAxios<PostDTO[] | null>>,) => {
-      return customAxios<PostDTO[] | null>(
-      {url: `/post`, method: 'GET'
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<PostDTO[] | null>(
+    {url: `/post`, method: 'GET'
     },
-      options);
-    }
-  /**
+    options);
+  }
+
+
+
+export const getList1Key = () => [`/post`] as const;
+
+export type List1QueryResult = NonNullable<Awaited<ReturnType<typeof list1>>>
+
+/**
+ * @summary 列表
+ */
+export const useList1 = <TError = ErrorType<ErrorModel>>(
+   options?: { swr?:SWRConfiguration<Awaited<ReturnType<typeof list1>>, TError> & { swrKey?: Key, enabled?: boolean }, request?: SecondParameter<typeof customAxios> }
+) => {
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const isEnabled = swrOptions?.enabled !== false
+  const swrKey = swrOptions?.swrKey ?? (() => isEnabled ? getList1Key() : null);
+  const swrFn = () => list1(requestOptions)
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}
+/**
  * 说说
  * @summary 新增
  */
 export const create = (
     createPostRequestBody: CreatePostRequestBody,
- options?: SecondParameter<typeof customAxios<PostDTO>>,) => {
-      return customAxios<PostDTO>(
-      {url: `/post`, method: 'POST',
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<PostDTO>(
+    {url: `/post`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: createPostRequestBody
     },
-      options);
-    }
-  /**
+    options);
+  }
+
+
+
+export const getCreateMutationFetcher = ( options?: SecondParameter<typeof customAxios>) => {
+  return (_: Key, { arg }: { arg: CreatePostRequestBody }) => {
+    return create(arg, options);
+  }
+}
+export const getCreateMutationKey = () => [`/post`] as const;
+
+export type CreateMutationResult = NonNullable<Awaited<ReturnType<typeof create>>>
+
+/**
+ * @summary 新增
+ */
+export const useCreate = <TError = ErrorType<ErrorModel>>(
+   options?: { swr?:SWRMutationConfiguration<Awaited<ReturnType<typeof create>>, TError, Key, CreatePostRequestBody, Awaited<ReturnType<typeof create>>> & { swrKey?: string }, request?: SecondParameter<typeof customAxios>}
+) => {
+
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const swrKey = swrOptions?.swrKey ?? getCreateMutationKey();
+  const swrFn = getCreateMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}
+/**
  * 说说
  * @summary 删除
  */
 export const remove = (
     id: number,
- options?: SecondParameter<typeof customAxios<void>>,) => {
-      return customAxios<void>(
-      {url: `/post/${id}`, method: 'DELETE'
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<void>(
+    {url: `/post/${id}`, method: 'DELETE'
     },
-      options);
-    }
-  /**
+    options);
+  }
+
+
+
+export const getRemoveMutationFetcher = (id: number, options?: SecondParameter<typeof customAxios>) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return remove(id, options);
+  }
+}
+export const getRemoveMutationKey = (id: number,) => [`/post/${id}`] as const;
+
+export type RemoveMutationResult = NonNullable<Awaited<ReturnType<typeof remove>>>
+
+/**
+ * @summary 删除
+ */
+export const useRemove = <TError = ErrorType<ErrorModel>>(
+  id: number, options?: { swr?:SWRMutationConfiguration<Awaited<ReturnType<typeof remove>>, TError, Key, Arguments, Awaited<ReturnType<typeof remove>>> & { swrKey?: string }, request?: SecondParameter<typeof customAxios>}
+) => {
+
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const swrKey = swrOptions?.swrKey ?? getRemoveMutationKey(id);
+  const swrFn = getRemoveMutationFetcher(id, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}
+/**
  * 说说
  * @summary 获取单条
  */
 export const get = (
     id: number,
- options?: SecondParameter<typeof customAxios<PostDTO>>,) => {
-      return customAxios<PostDTO>(
-      {url: `/post/${id}`, method: 'GET'
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<PostDTO>(
+    {url: `/post/${id}`, method: 'GET'
     },
-      options);
-    }
-  /**
+    options);
+  }
+
+
+
+export const getGetKey = (id: number,) => [`/post/${id}`] as const;
+
+export type GetQueryResult = NonNullable<Awaited<ReturnType<typeof get>>>
+
+/**
+ * @summary 获取单条
+ */
+export const useGet = <TError = ErrorType<ErrorModel>>(
+  id: number, options?: { swr?:SWRConfiguration<Awaited<ReturnType<typeof get>>, TError> & { swrKey?: Key, enabled?: boolean }, request?: SecondParameter<typeof customAxios> }
+) => {
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const isEnabled = swrOptions?.enabled !== false && id !== null && id !== undefined
+  const swrKey = swrOptions?.swrKey ?? (() => isEnabled ? getGetKey(id) : null);
+  const swrFn = () => get(id, requestOptions)
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}
+/**
  * 说说
  * @summary 更新
  */
 export const update = (
     id: number,
     updatePostRequestBody: UpdatePostRequestBody,
- options?: SecondParameter<typeof customAxios<void>>,) => {
-      return customAxios<void>(
-      {url: `/post/${id}`, method: 'PUT',
+ options?: SecondParameter<typeof customAxios>) => {
+    return customAxios<void>(
+    {url: `/post/${id}`, method: 'PUT',
       headers: {'Content-Type': 'application/json', },
       data: updatePostRequestBody
     },
-      options);
-    }
-  export type List1Result = NonNullable<Awaited<ReturnType<typeof list1>>>
-export type CreateResult = NonNullable<Awaited<ReturnType<typeof create>>>
-export type RemoveResult = NonNullable<Awaited<ReturnType<typeof remove>>>
-export type GetResult = NonNullable<Awaited<ReturnType<typeof get>>>
-export type UpdateResult = NonNullable<Awaited<ReturnType<typeof update>>>
+    options);
+  }
+
+
+
+export const getUpdateMutationFetcher = (id: number, options?: SecondParameter<typeof customAxios>) => {
+  return (_: Key, { arg }: { arg: UpdatePostRequestBody }) => {
+    return update(id, arg, options);
+  }
+}
+export const getUpdateMutationKey = (id: number,) => [`/post/${id}`] as const;
+
+export type UpdateMutationResult = NonNullable<Awaited<ReturnType<typeof update>>>
+
+/**
+ * @summary 更新
+ */
+export const useUpdate = <TError = ErrorType<ErrorModel>>(
+  id: number, options?: { swr?:SWRMutationConfiguration<Awaited<ReturnType<typeof update>>, TError, Key, UpdatePostRequestBody, Awaited<ReturnType<typeof update>>> & { swrKey?: string }, request?: SecondParameter<typeof customAxios>}
+) => {
+
+  const {swr: swrOptions, request: requestOptions} = options ?? {}
+
+  const swrKey = swrOptions?.swrKey ?? getUpdateMutationKey(id);
+  const swrFn = getUpdateMutationFetcher(id, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions)
+
+  return {
+    swrKey,
+    ...query
+  }
+}

@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from './articleDetailDTO.ts';
 export * from './articleDTO.ts';
 export * from './articleTypeDTO.ts';
 export * from './createPostRequestBody.ts';
